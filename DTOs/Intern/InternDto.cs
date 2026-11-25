@@ -53,8 +53,12 @@ namespace InterntManagementSystem.DTOs
     public class InternTaskListDto
     {
         public int Id { get; set; }
+        public int AssignmentId { get; set; }
+        public int AssignedToId { get; set; }
+        public int AssignedById { get; set; }
         public required string Title { get; set; }
         public required string Description { get; set; }
+        public TaskType TaskType { get; set; }
         public DateTime Deadline { get; set; }
         public bool IsCompleted { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

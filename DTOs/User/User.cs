@@ -46,11 +46,60 @@ namespace InterntManagementSystem.DTOs.User
 
     public class CreateInternReturnDto : CreateIntern
     {
+        public int Id { get; set; }
         public string password { get; set; } = string.Empty; // Şifre, intern oluşturulurken döndürülecek
     }
 
     public class CreateMentorReturnDto : CreateMentor
     {
+        public int Id { get; set; }
         public string password { get; set; } = string.Empty; // Şifre, mentor oluşturulurken döndürülecek
+    }
+
+    public class InternListDto
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public required string Lastname { get; set; }
+        public required string Email { get; set; }
+        public required string Department { get; set; }
+        public Discipline Discipline { get; set; }
+        public string? Phone { get; set; }
+        public string? University { get; set; }
+        public int? MentorId { get; set; }
+        public string? MentorName { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? EndDate { get; set; }
+        public Role Role { get; set; }
+    }
+
+    public class MentorListDto
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public required string Lastname { get; set; }
+        public required string Email { get; set; }
+        public required string Department { get; set; }
+        public Discipline Discipline { get; set; }
+        public int InternCount { get; set; }
+        public Role Role { get; set; }
+    }
+
+    public class LoginRequestDto
+    {
+        public required string Email { get; set; }
+        public required string Password { get; set; }
+    }
+
+    public class LoginResponseDto
+    {
+        public int Id { get; set; }
+        public required string Name { get; set; }
+        public required string Lastname { get; set; }
+        public required string Email { get; set; }
+        public required string Department { get; set; }
+        public Role Role { get; set; }
+        public Discipline? Discipline { get; set; }
+        public int? MentorId { get; set; }
     }
 }

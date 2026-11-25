@@ -1,0 +1,13 @@
+<router-outlet />
+
+@if (toastService.toasts().length > 0) {
+  <div class="toast-stack" role="status" aria-live="polite">
+    @for (toast of toastService.toasts(); track toast.id) {
+      <div class="toast" [class]="toast.type">
+        <span class="toast-dot"></span>
+        <span class="toast-text">{{ toast.text }}</span>
+        <button type="button" class="toast-close" (click)="toastService.dismiss(toast.id)">×</button>
+      </div>
+    }
+  </div>
+}

@@ -22,12 +22,16 @@ namespace InterntManagementSystem.Repository.Users
         {
             return await _context.InternTasks
                 .Where(it => it.AssignedToId == userId)
-                .Include(it => it.Assignment) // Assignment detaylarını da getir
+                .Include(it => it.Assignment)
                 .Select(it => new InternTaskListDto
                 {
-                    Id = it.AssignmentId,
+                    Id = it.Id,
+                    AssignmentId = it.AssignmentId,
+                    AssignedToId = it.AssignedToId,
+                    AssignedById = it.AssignedById,
                     Title = it.Assignment != null ? it.Assignment.Title ?? "No Title" : "No Title",
                     Description = it.Assignment != null ? it.Assignment.Description ?? "No Description" : "No Description",
+                    TaskType = it.Assignment != null ? it.Assignment.TaskType : TaskType.Project,
                     Deadline = it.Deadline,
                     IsCompleted = it.IsCompleted,
                     CreatedAt = it.CreatedAt,
@@ -38,16 +42,13 @@ namespace InterntManagementSystem.Repository.Users
         }
 
 
-        //buna bi bak
         public async Task<InternProfileDto> GetInternByIdAsync(int internId)
         {
-             var user = await _context.Interns
+            var user = await _context.Interns
                 .Include(i => i.Mentor)
                 .FirstOrDefaultAsync(u => u.Id == internId)
-                ?? throw new InvalidOperationException($"User with ID {internId} not found.");
+                ?? throw new KeyNotFoundException($"User with ID {internId} not found.");
 
-
-            //burayı maplemen lazım ileride
             return new InternProfileDto
             {
                 Id = user.Id,
@@ -62,22 +63,20 @@ namespace InterntManagementSystem.Repository.Users
             };
         }
 
-
-        //buna da bak
         public async Task<InternTaskDto> GetTaskByIdAsync(int taskId)
         {
             var task = await _context.InternTasks
                 .Include(it => it.Assignment)
                 .Include(it => it.AssignedTo)
-                    .ThenInclude(i => i.Mentor)
-                .FirstOrDefaultAsync(it => it.AssignmentId == taskId);
+                    .ThenInclude(i => i!.Mentor)
+                .FirstOrDefaultAsync(it => it.Id == taskId);
 
             if (task == null)
-                throw new InvalidOperationException($"Task with ID {taskId} not found.");
+                throw new KeyNotFoundException($"Task with ID {taskId} not found.");
 
             return new InternTaskDto
             {
-                Id = task.AssignmentId,
+                Id = task.Id,
                 Title = task.Assignment != null ? task.Assignment.Title ?? "No Title" : "No Title",
                 Description = task.Assignment != null ? task.Assignment.Description ?? "No Description" : "No Description",
                 Deadline = task.Deadline,
@@ -90,34 +89,45 @@ namespace InterntManagementSystem.Repository.Users
             };
         }
 
-        public Task<Intern> LoginAsync(InternLogin userLogin)
+        public async Task<Intern> LoginAsync(InternLogin userLogin)
         {
-            throw new NotImplementedException();
+            var intern = await _context.Interns
+                .FirstOrDefaultAsync(i => i.Email.ToLower() == userLogin.Email.ToLower());
+
+            if (intern == null || !BCrypt.Net.BCrypt.Verify(userLogin.Password, intern.HashedPassword))
+            {
+                throw new UnauthorizedAccessException("Invalid credentials.");
+            }
+
+            return intern;
         }
 
         public async Task<InternTaskListDto> UpdateTaskAsync(UpdateTask updateTask)
         {
             var task = await _context.InternTasks
                 .Include(it => it.Assignment)
-                .FirstOrDefaultAsync(it => it.AssignmentId == updateTask.id);
+                .FirstOrDefaultAsync(it => it.Id == updateTask.id);
             if (task == null)
             {
-                throw new InvalidOperationException($"Task with ID {updateTask.id} not found.");
+                throw new KeyNotFoundException($"Task with ID {updateTask.id} not found.");
             }
             task.IsCompleted = updateTask.IsCompleted;
-            task.CompletedAt = DateTime.UtcNow;
+            task.CompletedAt = updateTask.IsCompleted ? DateTime.UtcNow : null;
 
-             _context.InternTasks.Update(task);
+            _context.InternTasks.Update(task);
             await _context.SaveChangesAsync();
 
             return new InternTaskListDto
             {
-                Id = task.AssignmentId,
+                Id = task.Id,
+                AssignmentId = task.AssignmentId,
+                AssignedToId = task.AssignedToId,
+                AssignedById = task.AssignedById,
                 Title = task.Assignment != null ? task.Assignment.Title ?? "No Title" : "No Title",
                 Description = task.Assignment != null ? task.Assignment.Description ?? "No Description" : "No Description",
+                TaskType = task.Assignment != null ? task.Assignment.TaskType : TaskType.Project,
                 Deadline = task.Deadline,
                 IsCompleted = task.IsCompleted,
-
                 CreatedAt = task.CreatedAt,
                 StartDate = task.StartDate,
                 CompletedAt = task.CompletedAt

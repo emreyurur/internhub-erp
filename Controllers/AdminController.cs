@@ -18,11 +18,27 @@ namespace InterntManagementSystem.Controllers
             _adminService = adminService;
         }
 
+        // GET: api/Admin/Interns
+        [HttpGet("Interns")]
+        public async Task<ActionResult<List<InternListDto>>> GetAllInterns()
+        {
+            var interns = await _adminService.GetAllInternsAsync();
+            return Ok(interns);
+        }
+
+        // GET: api/Admin/Mentors
+        [HttpGet("Mentors")]
+        public async Task<ActionResult<List<MentorListDto>>> GetAllMentors()
+        {
+            var mentors = await _adminService.GetAllMentorsAsync();
+            return Ok(mentors);
+        }
+
         // POST: api/Admin/CreateIntern
         [HttpPost("CreateIntern")]
-        public async Task<ActionResult<CreateIntern>> CreateIntern([FromBody] CreateIntern dto)
+        public async Task<ActionResult<CreateInternReturnDto>> CreateIntern([FromBody] CreateIntern dto)
         {
-            if(dto.Role != Models.Role.Intern)
+            if (dto.Role != Models.Role.Intern)
             {
                 return BadRequest("Role must be Intern.");
             }
@@ -32,9 +48,9 @@ namespace InterntManagementSystem.Controllers
 
         // POST: api/Admin/CreateMentor
         [HttpPost("CreateMentor")]
-        public async Task<ActionResult<CreateMentor>> CreateMentor([FromBody] CreateMentor dto)
+        public async Task<ActionResult<CreateMentorReturnDto>> CreateMentor([FromBody] CreateMentor dto)
         {
-            if(dto.Role != Models.Role.Mentor)
+            if (dto.Role != Models.Role.Mentor)
             {
                 return BadRequest("Role must be Mentor.");
             }

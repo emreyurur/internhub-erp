@@ -19,9 +19,9 @@ namespace InterntManagementSystem.Controllers
             _userRepository = userRepository;
         }
 
-        // GET: api/User/tasks/{userId}
+        // GET: api/User/GetAllTaskByUserId/{userId}
         [HttpGet("GetAllTaskByUserId/{userId}")]
-        public async Task<ActionResult<List<Assignment>>> GetAllTasksByUserId(int userId)
+        public async Task<ActionResult<List<InternTaskListDto>>> GetAllTasksByUserId(int userId)
         {
             var tasks = await _userRepository.GetAllTasksByUserIdAsync(userId);
             return Ok(tasks);
@@ -29,34 +29,62 @@ namespace InterntManagementSystem.Controllers
 
         // GET: api/User/intern/{internId}
         [HttpGet("intern/{internId}")]
-        public async Task<ActionResult<Intern>> GetInternById(int internId)
+        public async Task<ActionResult<InternProfileDto>> GetInternById(int internId)
         {
-            var intern = await _userRepository.GetInternByIdAsync(internId);
-            return Ok(intern);
+            try
+            {
+                var intern = await _userRepository.GetInternByIdAsync(internId);
+                return Ok(intern);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
-        // GET: api/User/task/{taskId}
+        // GET: api/User/TaskById/{taskId}
         [HttpGet("TaskById/{taskId}")]
-        public async Task<ActionResult<Assignment>> GetTaskById(int taskId)
+        public async Task<ActionResult<InternTaskDto>> GetTaskById(int taskId)
         {
-            var task = await _userRepository.GetTaskByIdAsync(taskId);
-            return Ok(task);
+            try
+            {
+                var task = await _userRepository.GetTaskByIdAsync(taskId);
+                return Ok(task);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
-        // GET: api/User/{id}
+        // GET: api/User/GetInternById/{id}
         [HttpGet("GetInternById/{id}")]
-        public async Task<ActionResult<Models.User>> GetUserById(int id)
+        public async Task<ActionResult<InternProfileDto>> GetUserById(int id)
         {
-            var user = await _userRepository.GetInternByIdAsync(id);
-            return Ok(user);
+            try
+            {
+                var user = await _userRepository.GetInternByIdAsync(id);
+                return Ok(user);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
-        // POST: api/User/complete-task
+        // PATCH: api/User/complete-task
         [HttpPatch("complete-task")]
-        public async Task<ActionResult<InternTaskDto>> CompleteTask([FromBody] UpdateTask updateTask)
+        public async Task<ActionResult<InternTaskListDto>> CompleteTask([FromBody] UpdateTask updateTask)
         {
-            var task = await _userRepository.UpdateTaskAsync(updateTask);
-            return Ok(task);
+            try
+            {
+                var task = await _userRepository.UpdateTaskAsync(updateTask);
+                return Ok(task);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
     }
 }

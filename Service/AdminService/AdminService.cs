@@ -19,13 +19,25 @@ namespace InterntManagementSystem.Service.CreateUserService
             _adminRepository = adminRepository;
         }
 
+        public async Task<List<InternListDto>> GetAllInternsAsync()
+        {
+            return await _adminRepository.GetAllInternsAsync();
+        }
+
+        public async Task<List<MentorListDto>> GetAllMentorsAsync()
+        {
+            return await _adminRepository.GetAllMentorsAsync();
+        }
+
         public async Task<CreateInternReturnDto> CreateInternAsync(CreateIntern dto)
         {
             var password = await GenerateRandomPasswordAsync(12);
             var HashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
             dto.HashedPassword = HashedPassword;
-            var result = await _adminRepository.CreateInternAsync(dto);
-            return AdminMapper.MapToCreateInternReturnDto(result, password);
+            var (result, id) = await _adminRepository.CreateInternAsync(dto);
+            var returnDto = AdminMapper.MapToCreateInternReturnDto(result, password);
+            returnDto.Id = id;
+            return returnDto;
         }
 
         public async Task<bool> DeleteInternAsync(int internId)
@@ -35,11 +47,13 @@ namespace InterntManagementSystem.Service.CreateUserService
 
         public async Task<CreateMentorReturnDto> CreateMentorAsync(CreateMentor dto)
         {
-             var password = await GenerateRandomPasswordAsync(12);
+            var password = await GenerateRandomPasswordAsync(12);
             var HashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
             dto.HashedPassword = HashedPassword;
-            var result = await _adminRepository.CreateMentorAsync(dto);
-            return AdminMapper.MapToCreateMentorReturnDto(result, password);
+            var (result, id) = await _adminRepository.CreateMentorAsync(dto);
+            var returnDto = AdminMapper.MapToCreateMentorReturnDto(result, password);
+            returnDto.Id = id;
+            return returnDto;
         }
 
         public async Task<bool> DeleteMentorAsync(int mentorId)

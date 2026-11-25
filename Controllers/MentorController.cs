@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using InterntManagementSystem.Repository.Mentors;
 using InterntManagementSystem.DTOs.Mentor;
+using InterntManagementSystem.DTOs.User;
 using InterntManagementSystem.Models;
 using InterntManagementSystem.Interface.Repository.Mentor;
 using InterntManagementSystem.DTOs;
@@ -38,7 +39,7 @@ namespace InterntManagementSystem.Controllers
 
         // GET: api/Mentor/intern/{internId}
         [HttpGet("intern/{internId}")]
-        public async Task<ActionResult<Intern>> GetInternById(int internId)
+        public async Task<ActionResult<InternListDto>> GetInternById(int internId)
         {
             var intern = await _mentorRepository.GetInternByIdAsync(internId);
             if (intern == null)
@@ -48,7 +49,7 @@ namespace InterntManagementSystem.Controllers
 
         // GET: api/Mentor/interns/{mentorId}
         [HttpGet("interns/{mentorId}")]
-        public async Task<ActionResult<List<Intern>>> GetInternsByMentorId(int mentorId)
+        public async Task<ActionResult<List<InternListDto>>> GetInternsByMentorId(int mentorId)
         {
             var interns = await _mentorRepository.GetInternsByMentorIdAsync(mentorId);
             return Ok(interns);

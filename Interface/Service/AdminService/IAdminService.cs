@@ -8,6 +8,8 @@ namespace InterntManagementSystem.Interface.Service
 {
     public interface IAdminService
     {
+        Task<List<InternListDto>> GetAllInternsAsync();
+        Task<List<MentorListDto>> GetAllMentorsAsync();
         Task<CreateInternReturnDto> CreateInternAsync(CreateIntern dto);
         Task<bool> DeleteInternAsync(int internId);
 
@@ -15,7 +17,5 @@ namespace InterntManagementSystem.Interface.Service
         Task<bool> DeleteMentorAsync(int mentorId);
 
         Task<string> GenerateRandomPasswordAsync(int length);
-
-
     }
 }
